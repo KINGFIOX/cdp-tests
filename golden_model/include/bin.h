@@ -256,17 +256,17 @@
 #define B11111101 FD
 #define B11111110 FE
 #define B11111111 FF
- 
-#define __B8(B0)              0x##B0
-#define _B8(B0)               __B8(B0)
-#define B8(B0)                _B8(B##B0)
- 
-#define __B16(B1, B0)         0x##B1##B0
-#define _B16(B1, B0)          __B16(B1, B0)
-#define B16(B1, B0)           _B16(B##B1, B##B0)
- 
+
+#define __B8(B0) 0x##B0
+#define _B8(B0) __B8(B0)
+#define B8(B0) _B8(B##B0)
+
+#define __B16(B1, B0) 0x##B1##B0
+#define _B16(B1, B0) __B16(B1, B0)
+#define B16(B1, B0) _B16(B##B1, B##B0)
+
 #define __B32(B3, B2, B1, B0) 0x##B3##B2##B1##B0
-#define _B32(B3, B2, B1, B0)  __B32(B3, B2, B1, B0)
-#define B32(B3, B2, B1, B0)   _B32(B##B3, B##B2, B##B1, B##B0)
+#define _B32(B3, B2, B1, B0) __B32(B3, B2, B1, B0)
+#define B32(B3, B2, B1, B0) _B32(B##B3, B##B2, B##B1, B##B0)
 
 #endif
