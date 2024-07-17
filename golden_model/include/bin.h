@@ -1,5 +1,11 @@
 #ifndef __BIN__
 #define __BIN__
+
+/**
+ * @brief 二进制 -> 十六进制
+ *
+ */
+
 #define B00000000 00
 #define B00000001 01
 #define B00000010 02
@@ -257,9 +263,9 @@
 #define B11111110 FE
 #define B11111111 FF
 
-#define __B8(B0) 0x##B0
+#define __B8(B0) 0x##B0 // 就是加上 0x 前缀
 #define _B8(B0) __B8(B0)
-#define B8(B0) _B8(B##B0)
+#define B8(B0) _B8(B##B0) // 就是 B????_???? 这个也是字面量
 
 #define __B16(B1, B0) 0x##B1##B0
 #define _B16(B1, B0) __B16(B1, B0)
@@ -270,3 +276,10 @@
 #define B32(B3, B2, B1, B0) _B32(B##B3, B##B2, B##B1, B##B0)
 
 #endif
+
+// #include <stdio.h>
+
+// int main(void) {
+//   int value = B8(00010001);
+//   return value;
+// }
