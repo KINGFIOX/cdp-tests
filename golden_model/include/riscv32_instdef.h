@@ -79,7 +79,7 @@ typedef union
     uint32_t pad7 : 20;
     uint32_t csr : 12;
   } csr;
-  uint32_t inst_raw;
+  uint32_t inst_raw; // 原始的指令, 没有被划分 位域
 } Decodeinfo_raw;
 
 #endif
