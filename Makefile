@@ -5,6 +5,11 @@ TEST = addi
 TESTFILE = meminit.bin # 这个是初始化 irom 使用的
 PWD = $(shell pwd)
 
+run_for_python:  # should run "make all" first, for python-based test
+	@ln -sf bin/$(TEST).bin $(TESTFILE)
+	@./obj_dir/VminiRV_SoC $(TEST)
+	@rm -rf $(TESTFILE)
+
 chisel:
 	cd .. && sbt 'runMain Main'
 
@@ -15,16 +20,12 @@ build: $(VSRC) $(CSRC)
 run: build
 	@ln -sf bin/$(TEST).bin $(TESTFILE)
 	@./obj_dir/VminiRV_SoC $(TEST)
-run_for_python:  # should run "make all" first, for python-based test
-	@ln -sf bin/$(TEST).bin $(TESTFILE)
-	@./obj_dir/VminiRV_SoC $(TEST)
-	@rm -rf $(TESTFILE)
 $(TESTFILE):
 	ln -sf bin/$(TEST).bin $(TESTFILE)
 clean:
 	rm -rf obj_dir waveform $(TESTFILE)
+
 wave:
 	gtkwave -S load_all_waves.tcl -f waveform/$(TEST).vcd
-	
 
 .PHONY: run debug clean
