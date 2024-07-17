@@ -5,10 +5,10 @@ TEST = addi
 TESTFILE = meminit.bin # 这个是初始化 irom 使用的
 PWD = $(shell pwd)
 
-scala:
-	# cd .. && sbt 'runMain Main'
+chisel:
+	cd .. && sbt 'runMain Main'
 
-build: $(VSRC) $(CSRC) scala
+build: $(VSRC) $(CSRC)
 	@verilator -cc --exe --build $(VSRC) --top-module miniRV_SoC $(CSRC) $(SIM_OPTS) +define+PATH=$(TESTFILE) -CFLAGS -DPATH=$(TESTFILE) -ImySoC -CFLAGS -I$(PWD)/golden_model/include
 	@mkdir -p waveform
 
