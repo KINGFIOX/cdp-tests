@@ -1,0 +1,7 @@
+{
+    "files.associations": {
+        "assert.h": "c",
+        "riscv32_instdef.h": "c",
+        "debug.h": "c"
+    }
+}
