@@ -5,43 +5,52 @@
 #include <sys/types.h>
 #include <verilated_vcd_c.h>
 
-template <class MODULE> class TESTBENCH {
+template <class MODULE>
+class TESTBENCH
+{
 public:
-  VerilatedVcdC *vltdump;
+  VerilatedVcdC *vltdump; // dump 文件句柄
   MODULE *dut;
   unsigned long count;
 
-  TESTBENCH(void) {
+  TESTBENCH()
+  {
     Verilated::traceEverOn(true);
     dut = new MODULE;
     count = 0;
   }
 
-  ~TESTBENCH(void) {
-    closetrace();
+  // Open/create a trace file
+  void opentrace(const char *vcdName)
+  {
+    if (!vltdump)
+    {
+      vltdump = new VerilatedVcdC;
+      dut->trace(vltdump, 99);
+      vltdump->open(vcdName);
+    }
+  }
+
+  ~TESTBENCH()
+  {
+    close_trace();
     if (!vltdump)
       delete vltdump;
     delete dut;
   }
 
-  // Open/create a trace file
-  void opentrace(const char *vcdname) {
-    if (!vltdump) {
-      vltdump = new VerilatedVcdC;
-      dut->trace(vltdump, 99);
-      vltdump->open(vcdname);
-    }
-  }
-
   // Close a trace file
-  void closetrace(void) {
-    if (vltdump) {
+  void close_trace(void)
+  {
+    if (vltdump)
+    {
       vltdump->close();
       vltdump = NULL;
     }
   }
 
-  WB_info tick(void) {
+  WB_info tick(void)
+  {
     count++;
 
     dut->fpga_clk = 0;
@@ -59,7 +68,8 @@ public:
     // Now the negative edge
     dut->fpga_clk = 0;
     dut->eval();
-    if (vltdump) {
+    if (vltdump)
+    {
       vltdump->dump((vluint64_t)(10 * count + 5));
       vltdump->flush();
     }

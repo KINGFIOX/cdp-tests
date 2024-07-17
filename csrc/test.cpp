@@ -1,18 +1,28 @@
-#include "VminiRV_SoC.h"
-#include "dut.h"
-#include "verilated.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
+#include "VminiRV_SoC.h"
+#include "dut.h"
+#include "verilated.h"
+
 #define STR(x) #x
 #define STR_MACRO(x) STR(x)
 
-TESTBENCH<VminiRV_SoC> *top;
-VminiRV_SoC *top_module;
+/* ---------- ---------- 前向声明 ---------- ---------- */
+
 extern void init_cpu(const char *);
 extern WB_info cpu_run_once();
+
+/* ---------- ---------- 全局变量 ---------- ---------- */
+
+TESTBENCH<VminiRV_SoC> *top;
+VminiRV_SoC *top_module;
 double main_time = 0;
 double sc_time_stamp() { return main_time; }
+
+/* ---------- ----------  ---------- ---------- */
+
 void reset_all()
 {
   printf("[mycpu] Resetting ...\n");
@@ -64,6 +74,9 @@ int check(WB_info stu, WB_info ref)
 
 int main(int argc, char **argv, char **env)
 {
+
+  /* ---------- 初始化 ---------- */
+
   top = new TESTBENCH<VminiRV_SoC>;
   char dir[1024] = "waveform/";
   if (argc < 2 || strlen(argv[1]) > 1000)
@@ -74,6 +87,8 @@ int main(int argc, char **argv, char **env)
   top->opentrace(strcat(strcat(dir, argv[1]), ".vcd"));
   init_cpu(STR_MACRO(PATH));
   top_module = top->dut;
+
+  /* ---------- 开始仿真 ---------- */
 
   reset_all();
 
