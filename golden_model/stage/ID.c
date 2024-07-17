@@ -1,22 +1,37 @@
 #include <bin.h>
 #include <cpu.h>
 #include <stdint.h>
+
+/**
+ * @brief 相当于 { funct7, funct3 } 拼接在一起了
+ *  example: pair(ret.inst_raw_split.r.funct7, ret.inst_raw_split.r.funct3)
+ */
 #define pair(x, y) (((x) << 3) | (y))
-#define PAIR_ENTRY(x, y, OP)                                                   \
-  case pair(x, y):                                                             \
-    ret.alu_op = OP;                                                           \
+
+/**
+ * @brief 根据 opcode 指明是什么指令
+ *
+ */
+#define PAIR_ENTRY(x, y, OP) \
+  case pair(x, y):           \
+    ret.alu_op = OP;         \
     break
+
 extern riscv32_CPU_state cpu;
-ID2EX ID_R(IF2ID inst) {
-  // 10 instructions
-  // ADD/SLT/SLTU/AND/OR/XOR/SLL/SRL/SUB/SRA
+
+/* ---------- ---------- R-type ---------- ---------- */
+
+ID2EX ID_R(IF2ID inst)
+{
+  // 10 instructions // ADD/SLT/SLTU/AND/OR/XOR/SLL/SRL/SUB/SRA
   ID2EX ret;
   ret.inst_raw_split.inst_raw = inst.inst;
   ret.next_pc = inst.pc + 4;
   ret.pc = inst.pc;
   ret.inst = inst.inst;
 
-  switch (pair(ret.inst_raw_split.r.funct7, ret.inst_raw_split.r.funct3)) {
+  switch (pair(ret.inst_raw_split.r.funct7, ret.inst_raw_split.r.funct3))
+  {
     PAIR_ENTRY(0, 0, OP_ADD);
     PAIR_ENTRY(0, 1, OP_SLL);
     PAIR_ENTRY(0, 2, OP_SLT);
@@ -48,63 +63,19 @@ ID2EX ID_R(IF2ID inst) {
   return ret;
 }
 
-ID2EX ID_I_LOAD(IF2ID inst) {
-  // LOAD
-  ID2EX ret;
-  ret.inst_raw_split.inst_raw = inst.inst;
-  ret.alu_op = OP_ADD;
-  ret.next_pc = inst.pc + 4;
-  ret.pc = inst.pc;
-  ret.inst = inst.inst;
-  switch (ret.inst_raw_split.i.funct3) {
-  case 0:
-    ret.mem_op = MEM_LB;
-    break;
-  case 1:
-    ret.mem_op = MEM_LH;
-    break;
-  case 2:
-    ret.mem_op = MEM_LW;
-    break;
-  case 4:
-    ret.mem_op = MEM_LBU;
-    break;
-  case 5:
-    ret.mem_op = MEM_LHU;
-    break;
-  default:
-    ret.mem_op = MEM_LW;
-    break;
-  }
+/* ---------- ---------- I-type ---------- ---------- */
 
-  ret.is_jmp = 0;
-  ret.is_branch = 0;
-  ret.is_mem = 1;
-
-  ret.src1.type = OP_TYPE_REG;
-  ret.src1.value = cpu.gpr[ret.inst_raw_split.r.rs1];
-
-  ret.src2.type = OP_TYPE_IMM;
-  ret.src2.value = ret.inst_raw_split.i.simm11_0;
-
-  ret.dst = ret.inst_raw_split.r.rd;
-  ret.wb_sel = WB_LOAD;
-  ret.wb_en = 1;
-
-  return ret;
-}
-
-ID2EX ID_I(IF2ID inst) {
-  // 9 instructions
-  // ADDI/SLTI/SLTIU/ANDI/ORI/XORI
-  // SLLI/SRLI/SRAI
+ID2EX ID_I(IF2ID inst)
+{
+  // 9 instructions // ADDI/SLTI/SLTIU/ANDI/ORI/XORI // SLLI/SRLI/SRAI
   ID2EX ret;
   ret.inst_raw_split.inst_raw = inst.inst;
   ret.next_pc = inst.pc + 4;
   ret.pc = inst.pc;
   ret.inst = inst.inst;
 
-  switch (ret.inst_raw_split.i.funct3) {
+  switch (ret.inst_raw_split.i.funct3)
+  {
   case 0:
     ret.alu_op = OP_ADD;
     break;
@@ -145,7 +116,7 @@ ID2EX ID_I(IF2ID inst) {
   ret.src1.value = cpu.gpr[ret.inst_raw_split.r.rs1];
 
   ret.src2.type = OP_TYPE_IMM;
-  ret.src2.value = ret.inst_raw_split.i.simm11_0;
+  ret.src2.value = ret.inst_raw_split.i.simm11_0; // 这里能直接相等, 是因为位域也会符号拓展的
 
   ret.dst = ret.inst_raw_split.r.rd;
   ret.wb_sel = WB_ALU;
@@ -153,9 +124,63 @@ ID2EX ID_I(IF2ID inst) {
 
   return ret;
 }
-ID2EX ID_S(IF2ID inst) {
-  // 1 instruction
-  // STORE
+
+/* ---------- ---------- load ---------- ---------- */
+
+ID2EX ID_I_LOAD(IF2ID inst /* 包含有 raw_inst 和 指令的地址 */)
+{
+  // LOAD
+  ID2EX ret;
+  ret.inst_raw_split.inst_raw = inst.inst;
+  ret.alu_op = OP_ADD; // 有点串联的意思: alu -> mem
+  ret.next_pc = inst.pc + 4;
+  ret.pc = inst.pc;
+  ret.inst = inst.inst;
+
+  switch (ret.inst_raw_split.i.funct3)
+  {
+  case 0:
+    ret.mem_op = MEM_LB;
+    break;
+  case 1:
+    ret.mem_op = MEM_LH;
+    break;
+  case 2:
+    ret.mem_op = MEM_LW;
+    break;
+  case 4:
+    ret.mem_op = MEM_LBU;
+    break;
+  case 5:
+    ret.mem_op = MEM_LHU;
+    break;
+  default:
+    ret.mem_op = MEM_LW;
+    break;
+  }
+
+  ret.is_jmp = 0;
+  ret.is_branch = 0;
+  ret.is_mem = 1;
+
+  ret.src1.type = OP_TYPE_REG;
+  ret.src1.value = cpu.gpr[ret.inst_raw_split.r.rs1];
+
+  ret.src2.type = OP_TYPE_IMM;
+  ret.src2.value = ret.inst_raw_split.i.simm11_0;
+
+  ret.dst = ret.inst_raw_split.r.rd;
+  ret.wb_sel = WB_LOAD;
+  ret.wb_en = 1;
+
+  return ret;
+}
+
+/* ---------- ---------- store ---------- ---------- */
+
+ID2EX ID_S(IF2ID inst)
+{
+  // 1 instruction // STORE
   ID2EX ret;
   ret.inst_raw_split.inst_raw = inst.inst;
   ret.next_pc = inst.pc + 4;
@@ -168,7 +193,8 @@ ID2EX ID_S(IF2ID inst) {
 
   ret.alu_op = OP_ADD;
 
-  switch (ret.inst_raw_split.s.funct3) {
+  switch (ret.inst_raw_split.s.funct3)
+  {
   case 0:
     ret.mem_op = MEM_SB;
     break;
@@ -197,14 +223,15 @@ ID2EX ID_S(IF2ID inst) {
   return ret;
 }
 
-ID2EX ID_B(IF2ID inst) {
-  // 6 instructions
-  // BEQ/BNE/BLT/BLTU/BGE/BGEU
+/* ---------- ---------- branch ---------- ---------- */
+
+ID2EX ID_B(IF2ID inst)
+{
+  // 6 instructions // BEQ/BNE/BLT/BLTU/BGE/BGEU
   ID2EX ret;
   ret.inst_raw_split.inst_raw = inst.inst;
-  uint32_t imm =
-      (ret.inst_raw_split.b.simm12 << 12) | (ret.inst_raw_split.b.imm11 << 11) |
-      (ret.inst_raw_split.b.imm10_5 << 5) | (ret.inst_raw_split.b.imm4_1 << 1);
+  uint32_t imm = (ret.inst_raw_split.b.simm12 << 12) | (ret.inst_raw_split.b.imm11 << 11) |
+                 (ret.inst_raw_split.b.imm10_5 << 5) | (ret.inst_raw_split.b.imm4_1 << 1);
   ret.next_pc = inst.pc + imm;
   ret.pc = inst.pc;
   ret.inst = inst.inst;
@@ -215,7 +242,8 @@ ID2EX ID_B(IF2ID inst) {
 
   ret.alu_op = OP_ADD;
 
-  switch (ret.inst_raw_split.b.funct3) {
+  switch (ret.inst_raw_split.b.funct3)
+  {
   case 0:
     ret.br_op = BR_EQ;
     break;
@@ -247,9 +275,11 @@ ID2EX ID_B(IF2ID inst) {
   return ret;
 }
 
-ID2EX ID_U(IF2ID inst) {
-  // 2 instructions
-  // LUI/AUIPC
+/* ---------- ---------- auipc, lui ---------- ---------- */
+
+ID2EX ID_U(IF2ID inst)
+{
+  // 2 instructions // LUI/AUIPC
   ID2EX ret;
   ret.inst_raw_split.inst_raw = inst.inst;
   ret.next_pc = inst.pc + 4;
@@ -262,9 +292,12 @@ ID2EX ID_U(IF2ID inst) {
 
   ret.alu_op = OP_ADD;
 
-  if (ret.inst_raw_split.u.opcode6_2 == 0xd) {
+  if (ret.inst_raw_split.u.opcode6_2 == 0xd)
+  {
     ret.src1.value = 0;
-  } else {
+  }
+  else
+  {
     ret.src1.value = inst.pc;
   }
   ret.src2.value = (ret.inst_raw_split.u.imm31_12 << 12);
@@ -276,7 +309,12 @@ ID2EX ID_U(IF2ID inst) {
   return ret;
 }
 
-ID2EX ID_J(IF2ID inst) {
+/* ---------- ---------- jal jalr ---------- ---------- */
+
+// 虽然 jalr 好像是 I-type 指令
+
+ID2EX ID_J(IF2ID inst)
+{
   // JAL/JALR
   ID2EX ret;
   ret.inst_raw_split.inst_raw = inst.inst;
@@ -289,13 +327,15 @@ ID2EX ID_J(IF2ID inst) {
   ret.is_mem = 0;
 
   ret.alu_op = OP_ADD;
-  uint32_t jimm = (ret.inst_raw_split.j.simm20 << 20) |
-                  (ret.inst_raw_split.j.imm19_12 << 12) |
-                  (ret.inst_raw_split.j.imm11 << 11) |
-                  (ret.inst_raw_split.j.imm10_1 << 1);
-  if (ret.inst_raw_split.j.opcode6_2 == 0x1b) { // JAL
+  uint32_t jimm = (ret.inst_raw_split.j.simm20 << 20) | (ret.inst_raw_split.j.imm19_12 << 12) |
+                  (ret.inst_raw_split.j.imm11 << 11) | (ret.inst_raw_split.j.imm10_1 << 1);
+
+  if (ret.inst_raw_split.j.opcode6_2 == 0x1b)
+  { // JAL
     ret.next_pc = inst.pc + jimm;
-  } else { // JALR
+  }
+  else
+  { // JALR
     ret.next_pc =
         cpu.gpr[ret.inst_raw_split.r.rs1] + ret.inst_raw_split.i.simm11_0;
   }
@@ -307,18 +347,23 @@ ID2EX ID_J(IF2ID inst) {
   return ret;
 }
 
-ID2EX ID(IF2ID inst) {
+/* ---------- ----------  ---------- ---------- */
+
+ID2EX ID(IF2ID inst)
+{
   ID2EX ret;
   ret.inst_raw_split.inst_raw = inst.inst;
   ret.next_pc = inst.pc + 4;
   ret.pc = inst.pc;
   ret.inst = inst.inst;
   ret.wb_en = 0;
-  Log("OpCode is %8.8x", ((ret.inst_raw_split.i.opcode6_2) << 2) |
-                             (ret.inst_raw_split.i.opcode1_0));
-  switch (((ret.inst_raw_split.i.opcode6_2) << 2) |
-          (ret.inst_raw_split.i.opcode1_0)) { // funct7
-  case 0x73:                                  // ecall, treat as halt
+  Log("OpCode is %8.8x", ((ret.inst_raw_split.i.opcode6_2) << 2) | (ret.inst_raw_split.i.opcode1_0));
+
+  /* ---------- switch-case, 构造出 传给 EX 的 inst ---------- */
+
+  switch (((ret.inst_raw_split.i.opcode6_2) << 2) | (ret.inst_raw_split.i.opcode1_0))
+  {          // funct7
+  case 0x73: // ecall, treat as halt
     ret.alu_op = OP_ECALL;
     break;
   case B8(00110111):
@@ -350,5 +395,6 @@ ID2EX ID(IF2ID inst) {
     ret.alu_op = OP_INVALID;
     break;
   }
+
   return ret;
 }
