@@ -69,6 +69,13 @@ int check(WB_info stu, WB_info ref)
     printf("debug_wb_value\t0x%8.8x\t0x%8.8x\n", ref.wb_value, stu.wb_value);
     exit(-1);
   }
+
+  printf("=========== info ===========\n");
+  printf("SIGNAL NAME\tREFERENCE\tMYCPU\n");
+  printf("debug_wb_pc\t0x%8.8x\t0x%8.8x\n", ref.wb_pc, stu.wb_pc);
+  printf("debug_wb_ena\t%10d\t%10d\n", ref.wb_ena, stu.wb_ena);
+  printf("debug_wb_reg\t%10d\t%10d\n", ref.wb_reg, stu.wb_reg);
+  printf("debug_wb_value\t0x%8.8x\t0x%8.8x\n", ref.wb_value, stu.wb_value);
   return 0;
 }
 

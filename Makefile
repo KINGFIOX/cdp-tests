@@ -1,8 +1,8 @@
 VSRC = $(wildcard vsrc/ram.v mySoC/*)
 CSRC = $(wildcard golden_model/*.c) $(wildcard golden_model/stage/*.c) $(wildcard golden_model/peripheral/*.c) $(wildcard csrc/*.c csrc/*.cpp)
 SIM_OPTS = --trace -Wno-lint -Wno-style -Wno-TIMESCALEMOD
-TEST = addi
-TESTFILE = meminit.bin # 这个是初始化 irom 使用的
+TEST = start
+TESTFILE = meminit.bin
 PWD = $(shell pwd)
 
 run_for_python:  # should run "make all" first, for python-based test
