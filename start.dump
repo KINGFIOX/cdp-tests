@@ -1732,11 +1732,11 @@ Disassembly of section .text.init:
     1650:	000f80e7          	jalr	x1,0(x31)
 
 00001654 <n22_sw_test>:
-    1654:	000040b7          	lui	x1,0x4
-    1658:	01008093          	addi	x1,x1,16 # 4010 <tdat_sw>
-    165c:	00aa0137          	lui	x2,0xaa0
-    1660:	0aa10113          	addi	x2,x2,170 # aa00aa <_end+0xa9c03a>
-    1664:	0020a023          	sw	x2,0(x1)
+    1654:	000040b7          	lui	x1,0x4                                      # x1 = 0x00004000
+    1658:	01008093          	addi	x1,x1,16 # 4010 <tdat_sw>               # x1 = 0x00004010
+    165c:	00aa0137          	lui	x2,0xaa0                                    # x2 = 0x00aa0000
+    1660:	0aa10113          	addi	x2,x2,170 # aa00aa <_end+0xa9c03a>      # x2 = 0x00aa00aa
+    1664:	0020a023          	sw	x2,0(x1)                                    # mem(4010) = 0x00aa00aa
     1668:	0000a703          	lw	x14,0(x1)
     166c:	00aa03b7          	lui	x7,0xaa0
     1670:	0aa38393          	addi	x7,x7,170 # aa00aa <_end+0xa9c03a>
@@ -2578,11 +2578,11 @@ Disassembly of section .text.init:
     2190:	8e0fe06f          	jal	x0,270 <fail>
 
 00002194 <test_32010>:
-    2194:	00002097          	auipc	x1,0x2
-    2198:	ed808093          	addi	x1,x1,-296 # 406c <tdat_sb9>
-    219c:	12345137          	lui	x2,0x12345
-    21a0:	67810113          	addi	x2,x2,1656 # 12345678 <_end+0x12341608>
-    21a4:	fe008213          	addi	x4,x1,-32
+    2194:	00002097          	auipc	x1,0x2                                      # x1 = 0x0000_4194
+    2198:	ed808093          	addi	x1,x1,-296 # 406c <tdat_sb9>                # x1 = 0x0000_406c
+    219c:	12345137          	lui	x2,0x12345                                      # x2 = 0x1234_5000
+    21a0:	67810113          	addi	x2,x2,1656 # 12345678 <_end+0x12341608>     # x2 = 0x1234_5678
+    21a4:	fe008213          	addi	x4,x1,-32                                   # x4 = 0x0000_404c
     21a8:	02220023          	sb	x2,32(x4) # 20 <reset_vector+0x1c>
     21ac:	00008283          	lb	x5,0(x1)
     21b0:	07800393          	addi	x7,x0,120
@@ -2593,13 +2593,13 @@ Disassembly of section .text.init:
 
 000021c4 <test_32011>:
     21c4:	00002097          	auipc	x1,0x2
-    21c8:	ea808093          	addi	x1,x1,-344 # 406c <tdat_sb9>
+    21c8:	ea808093          	addi	x1,x1,-344 # 406c <tdat_sb9>            # x1 = 0x0000406c
     21cc:	00003137          	lui	x2,0x3
-    21d0:	09810113          	addi	x2,x2,152 # 3098 <fromhost+0x58>
-    21d4:	ffa08093          	addi	x1,x1,-6
-    21d8:	002083a3          	sb	x2,7(x1)
+    21d0:	09810113          	addi	x2,x2,152 # 3098 <fromhost+0x58>        # x2 = 0x00003098
+    21d4:	ffa08093          	addi	x1,x1,-6                                # x1 = 0x00004066
+    21d8:	002083a3          	sb	x2,7(x1)                                    #  Mem(0x0000406d) = 0x98
     21dc:	00002217          	auipc	x4,0x2
-    21e0:	e9120213          	addi	x4,x4,-367 # 406d <tdat_sb10>
+    21e0:	e9120213          	addi	x4,x4,-367 # 406d <tdat_sb10>           # x4 = 0x0000406d
     21e4:	00020283          	lb	x5,0(x4) # 0 <_start>
     21e8:	f9800393          	addi	x7,x0,-104
     21ec:	000081b7          	lui	x3,0x8
