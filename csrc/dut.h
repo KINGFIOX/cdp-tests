@@ -1,9 +1,10 @@
 #ifndef __DUT__
 #define __DUT__
 
-#include <cpu.h>
 #include <sys/types.h>
 #include <verilated_vcd_c.h>
+
+#include "cpu.h"
 
 template <class MODULE>
 class TESTBENCH

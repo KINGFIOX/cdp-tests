@@ -1,6 +1,7 @@
-#include <bin.h>
-#include <cpu.h>
 #include <stdint.h>
+
+#include "bin.h"
+#include "cpu.h"
 
 /**
  * @brief 相当于 { funct7, funct3 } 拼接在一起了
@@ -334,10 +335,9 @@ ID2EX ID_J(IF2ID inst)
   { // JAL
     ret.next_pc = inst.pc + jimm;
   }
-  else
+  else if (ret.inst_raw_split.j.opcode6_2 == 0x19)
   { // JALR
-    ret.next_pc =
-        cpu.gpr[ret.inst_raw_split.r.rs1] + ret.inst_raw_split.i.simm11_0;
+    ret.next_pc = cpu.gpr[ret.inst_raw_split.r.rs1] + ret.inst_raw_split.i.simm11_0;
   }
 
   ret.dst = ret.inst_raw_split.j.rd;

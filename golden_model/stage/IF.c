@@ -1,5 +1,6 @@
-#include <cpu.h>
 #include <stdio.h>
+
+#include "cpu.h"
 
 extern riscv32_CPU_state cpu;
 

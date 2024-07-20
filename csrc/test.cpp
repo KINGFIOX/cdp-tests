@@ -6,12 +6,9 @@
 #include "dut.h"
 #include "verilated.h"
 
-#define STR(x) #x
-#define STR_MACRO(x) STR(x)
-
 /* ---------- ---------- 前向声明 ---------- ---------- */
 
-extern void init_cpu(const char *);
+extern void init_cpu();
 extern WB_info cpu_run_once();
 
 /* ---------- ---------- 全局变量 ---------- ---------- */
@@ -92,7 +89,7 @@ int main(int argc, char **argv, char **env)
     exit(-1);
   }
   top->opentrace(strcat(strcat(dir, argv[1]), ".vcd"));
-  init_cpu(STR_MACRO(PATH));
+  init_cpu(); /* PATH 是 makefile 中传入的 */
   top_module = top->dut;
 
   /* ---------- 开始仿真 ---------- */

@@ -1,9 +1,10 @@
-#include <cpu.h>
-#include <debug.h>
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
+
+#include "cpu.h"
+#include <debug.h>
 
 #include "peripheral/onboard.h"
 #include "peripheral/result_monitor.h"
@@ -36,10 +37,16 @@ peripheral_descr peripherals[MAX_PERIPHERAL];
 uint32_t num_peripherals = 0;
 
 /**
- * @brief 内存大小
+ * @brief irom
  *
  */
 uint32_t memory[MEM_SZ / sizeof(uint32_t)];
+
+/**
+ * @brief trap_memory
+ *
+ */
+uint32_t trap_memory[MEM_SZ / sizeof(uint32_t)];
 
 /* ---------- ---------- 前向声明 ---------- ---------- */
 
@@ -153,15 +160,18 @@ void init_memory(const char *fname)
   fclose(fp);
 }
 
+#define STR(x) #x
+#define STR_MACRO(x) STR(x)
+
 /**
  * @brief
  *
  * @param fname 文件名称, 后面会传给 init_memory
  */
-void init_cpu(const char *fname)
+void init_cpu()
 {
   cpu.npc = 0;
   register_peripheral("MONITOR", 0x80000000, 0x8, read_monitor, write_monitor);
   register_peripheral("Digit", 0xFFFFF000, 0x4, read_seven_seg, write_seven_seg);
-  init_memory(fname);
+  init_memory(STR_MACRO(PATH));
 }

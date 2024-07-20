@@ -1,8 +1,0 @@
-{
-    "files.associations": {
-        "assert.h": "c",
-        "riscv32_instdef.h": "c",
-        "debug.h": "c",
-        "result_monitor.h": "c"
-    }
-}
