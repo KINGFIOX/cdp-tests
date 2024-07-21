@@ -173,5 +173,5 @@ void init_cpu()
   cpu.npc = 0;
   register_peripheral("MONITOR", 0x80000000, 0x8, read_monitor, write_monitor);
   register_peripheral("Digit", 0xFFFFF000, 0x4, read_seven_seg, write_seven_seg);
-  init_memory(STR_MACRO(PATH));
+  init_memory("meminit.bin");
 }

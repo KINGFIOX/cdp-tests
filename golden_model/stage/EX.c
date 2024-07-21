@@ -1,7 +1,8 @@
-#include <cpu.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
+
+#include "cpu.h"
 
 #define CHECK_A0
 

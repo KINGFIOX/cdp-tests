@@ -3,6 +3,7 @@ CSRC = $(wildcard golden_model/*.c) $(wildcard golden_model/stage/*.c) $(wildcar
 SIM_OPTS = --trace -Wno-lint -Wno-style -Wno-TIMESCALEMOD
 TEST = start
 TESTFILE = meminit.bin
+TRAPFILE = trap_handle.coe
 PWD = $(shell pwd)
 
 run_for_python:  # should run "make all" first, for python-based test
@@ -14,7 +15,7 @@ chisel:
 	cd .. && sbt 'runMain Main'
 
 build: $(VSRC) $(CSRC)
-	@verilator -cc --exe --build $(VSRC) --top-module miniRV_SoC $(CSRC) $(SIM_OPTS) +define+PATH=$(TESTFILE) -CFLAGS -DPATH=$(TESTFILE) -ImySoC -CFLAGS -I$(PWD)/golden_model/include
+	@verilator -cc --exe --build $(VSRC) --top-module miniRV_SoC $(CSRC) $(SIM_OPTS) +define+PATH=$(TESTFILE) +define+TRAP=$(TRAPFILE) -CFLAGS -DPATH=$(TESTFILE) -ImySoC -CFLAGS -I$(PWD)/golden_model/include
 	@mkdir -p waveform
 
 run: build
