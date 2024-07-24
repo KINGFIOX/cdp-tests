@@ -23,12 +23,12 @@ double sc_time_stamp() { return main_time; }
 void reset_all()
 {
   printf("[mycpu] Resetting ...\n");
-  top_module->fpga_rst = 1;
+  top_module->reset = 1;
   for (int i = 0; i < 20; i++)
   {
     top->tick();
   }
-  top_module->fpga_rst = 0;
+  top_module->reset = 0;
   printf("[mycpu] Reset done.\n");
 }
 

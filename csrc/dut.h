@@ -54,20 +54,20 @@ public:
   {
     count++;
 
-    dut->fpga_clk = 0;
+    dut->clock = 0;
     dut->eval();
 
     if (vltdump)
       vltdump->dump((vluint64_t)(10 * count - 1));
 
     // Repeat for the positive edge of the clock
-    dut->fpga_clk = 1;
+    dut->clock = 1;
     dut->eval();
     if (vltdump)
       vltdump->dump((vluint64_t)(10 * count));
 
     // Now the negative edge
-    dut->fpga_clk = 0;
+    dut->clock = 0;
     dut->eval();
     if (vltdump)
     {
@@ -75,11 +75,11 @@ public:
       vltdump->flush();
     }
     WB_info ret;
-    ret.wb_have_inst = dut->debug_wb_have_inst;
-    ret.wb_pc = dut->debug_wb_pc;
-    ret.wb_ena = dut->debug_wb_ena;
-    ret.wb_reg = dut->debug_wb_reg;
-    ret.wb_value = dut->debug_wb_value;
+    ret.wb_have_inst = dut->io_dbg_wb_have_inst;
+    ret.wb_pc = dut->io_dbg_wb_pc;
+    ret.wb_ena = dut->io_dbg_wb_ena;
+    ret.wb_reg = dut->io_dbg_wb_reg;
+    ret.wb_value = dut->io_dbg_wb_value;
     return ret;
   }
 };
