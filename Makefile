@@ -1,7 +1,7 @@
 VSRC = $(wildcard vsrc/ram.v ../generated/miniRV_SoC.sv)
 CSRC = $(wildcard golden_model/*.c) $(wildcard golden_model/stage/*.c) $(wildcard golden_model/peripheral/*.c) $(wildcard csrc/*.c csrc/*.cpp)
 SIM_OPTS = --trace -Wno-lint -Wno-style -Wno-TIMESCALEMOD
-TEST = start
+TEST = lw
 TESTFILE = meminit.bin
 TRAPFILE = trap_handle.coe
 PWD = $(shell pwd)

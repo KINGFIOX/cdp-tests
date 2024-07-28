@@ -1,3 +1,4 @@
+#include <iostream>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -13,7 +14,8 @@ extern WB_info cpu_run_once();
 
 /* ---------- ---------- 全局变量 ---------- ---------- */
 
-TESTBENCH<VminiRV_SoC> *top;
+// TESTBENCH<VminiRV_SoC> *top;
+TESTBENCH *top;
 VminiRV_SoC *top_module;
 double main_time = 0;
 double sc_time_stamp() { return main_time; }
@@ -66,13 +68,17 @@ int check(WB_info stu, WB_info ref)
     printf("debug_wb_value\t0x%8.8x\t0x%8.8x\n", ref.wb_value, stu.wb_value);
     exit(-1);
   }
+  else
+  {
+    // printf("=========== info ===========\n");
+    // printf("SIGNAL NAME\tREFERENCE\tMYCPU\n");
+    // printf("debug_wb_pc\t0x%8.8x\t0x%8.8x\n", ref.wb_pc, stu.wb_pc);
+    // printf("debug_wb_ena\t%10d\t%10d\n", ref.wb_ena, stu.wb_ena);
+    // printf("debug_wb_reg\t%10d\t%10d\n", ref.wb_reg, stu.wb_reg);
+    // printf("debug_wb_value\t0x%8.8x\t0x%8.8x\n", ref.wb_value, stu.wb_value);
+  }
 
-  printf("=========== info ===========\n");
-  printf("SIGNAL NAME\tREFERENCE\tMYCPU\n");
-  printf("debug_wb_pc\t0x%8.8x\t0x%8.8x\n", ref.wb_pc, stu.wb_pc);
-  printf("debug_wb_ena\t%10d\t%10d\n", ref.wb_ena, stu.wb_ena);
-  printf("debug_wb_reg\t%10d\t%10d\n", ref.wb_reg, stu.wb_reg);
-  printf("debug_wb_value\t0x%8.8x\t0x%8.8x\n", ref.wb_value, stu.wb_value);
+  // std::cout << stu.inst_valid << std::endl;
   return 0;
 }
 
@@ -81,7 +87,8 @@ int main(int argc, char **argv, char **env)
 
   /* ---------- 初始化 ---------- */
 
-  top = new TESTBENCH<VminiRV_SoC>;
+  // top = new TESTBENCH<VminiRV_SoC>;
+  top = new TESTBENCH();
   char dir[1024] = "waveform/";
   if (argc < 2 || strlen(argv[1]) > 1000)
   {
@@ -96,12 +103,15 @@ int main(int argc, char **argv, char **env)
 
   reset_all();
 
+  top->tick();
+  top->tick();
+
   printf("[difftest] Test Start!\n");
   WB_info rtl_wb_info, model_wb_info;
   for (int i = 0; i < 1000000; i++)
   {
     rtl_wb_info = top->tick();
-    if (rtl_wb_info.wb_have_inst)
+    if (rtl_wb_info.wb_have_inst) // 只有这里有指令了, cpu_run_once 才会执行一次
     {
       if (check(rtl_wb_info, cpu_run_once()) == -1)
       {

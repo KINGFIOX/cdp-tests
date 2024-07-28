@@ -6,9 +6,11 @@
 
 #include "cpu.h"
 
-template <class MODULE>
+// template <class MODULE>
 class TESTBENCH
 {
+  using MODULE = VminiRV_SoC;
+
 public:
   VerilatedVcdC *vltdump; // dump 文件句柄
   MODULE *dut;
@@ -80,6 +82,7 @@ public:
     ret.wb_ena = dut->io_dbg_wb_ena;
     ret.wb_reg = dut->io_dbg_wb_reg;
     ret.wb_value = dut->io_dbg_wb_value;
+    ret.inst_valid = dut->io_dbg_inst_valid;
     return ret;
   }
 };

@@ -117,6 +117,7 @@ typedef struct
   __uint32_t wb_reg;
   __uint32_t wb_value;
   __uint32_t wb_ena;
+  __uint32_t inst_valid;
 } WB_info;
 
 /**
